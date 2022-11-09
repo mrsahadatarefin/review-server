@@ -21,7 +21,21 @@ async function run(){
 try{
 const serviceCollection =client.db('review').collection('services');
  const orderCollection = client.db("review").collection('order');
-app.get('/services',async(req,res)=>{
+
+ app.post('/service', async(req,res)=>{
+   const service = req.body;
+   const result =await  serviceCollection.insertOne(service)
+   res.send(result);
+
+
+
+
+
+})
+
+
+
+ app.get('/services',async(req,res)=>{
 
     const query={}
     const cursor= serviceCollection.find(query);
@@ -35,6 +49,9 @@ app.get('/service/:id',async(req,res)=>{
     const service =await serviceCollection.findOne(query)
     res.send(service);
 });
+
+
+
 
 app.get('/orders', async(req,res)=>{
 
