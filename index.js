@@ -6,7 +6,6 @@ const port = process.env.PORT||5000;
 require('dotenv').config();
 
 
-
 app.use(cors());
 app.use(express.json());
 console.log(process.env.DB_USER)
@@ -23,25 +22,21 @@ const serviceCollection =client.db('review').collection('services');
  const orderCollection = client.db("review").collection('order');
 
  app.post('/service', async(req,res)=>{
-   const service = req.body;
-   const resultAll =await  serviceCollection.insertOne(service)
-   res.send(resultAll);
+   const service = await req.body;
+   console.log("service", service);
 
-
-
-
-
+   const resultAll = await  serviceCollection.insertOne(service)
+   res.json({data: resultAll, status: 200, message: "Service added successfully"});
 })
 
-
-
  app.get('/services',async(req,res)=>{
-
     const query={}
-    const cursor= serviceCollection.find(query);
+    const limit = req.query?.limit || null; 
+    console.log(limit)
+
+    const cursor= serviceCollection.find(query, {limit: limit});
     const services =await cursor.toArray();
     res.send(services);
-
 })
 app.get('/service/:id',async(req,res)=>{
     const id = req.params.id;
@@ -54,33 +49,37 @@ app.get('/service/:id',async(req,res)=>{
 
 
 app.get('/orders', async(req,res)=>{
-
-
     let query ={};
 
     if(req.query.email){
         query ={
             email: req.query.email
         }
-    }
-    const cursor = orderCollection.find(query);
-    const orders =await cursor.toArray();
-    res.send(orders);
+    }    
 
+    const cursor = await orderCollection.find(query);
+    const orders =await cursor.toArray();
+    res.send({data: orders, status: 200, message: "User Order Data get success"});
 })
+
+app.get('/orders/:id',async(req,res)=>{
+    const serviceId = await req.params.id;
+    const query = {service: serviceId};
+    let orders =await orderCollection.find(query)
+    orders =await orders.toArray();
+    res.send(orders);
+});
+
+
 
 app.post('/orders', async(req,res)=>{
    const order= req.body;
    const result = await orderCollection.insertOne(order);
    res.send(result);
-
 })
-
-}
-finally{
-
 }
 
+finally{}
 
 }
 run().catch(err=>console.error(err));
