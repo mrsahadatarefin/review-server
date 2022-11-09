@@ -24,8 +24,8 @@ const serviceCollection =client.db('review').collection('services');
 
  app.post('/service', async(req,res)=>{
    const service = req.body;
-   const result =await  serviceCollection.insertOne(service)
-   res.send(result);
+   const resultAll =await  serviceCollection.insertOne(service)
+   res.send(resultAll);
 
 
 
